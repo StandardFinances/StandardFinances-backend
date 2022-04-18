@@ -2,7 +2,9 @@ package authy
 
 import (
 	"github.com/gin-gonic/gin"
+	"main/db"
 	"net/http"
+	"strconv"
 )
 
 type SendCodeParams struct {
@@ -25,12 +27,18 @@ func SendCodeEndpoint(c *gin.Context) {
 		return
 	}
 
-	//db := getDb()
+	//
+	// TODO: Check if the phone number is valid.
+	//
+	phone, _ := strconv.ParseInt(params.PhoneNumber, 10, 64)
 
-	//phoneInt, _ := strconv.ParseInt(params.PhoneNumber, 10, 64)
-	//db.User.Create().SetUID(uuid.New().String()).SetPhone(phoneInt).SetRegtime(time.Now()).Save(context.Background())
+	instance := db.GetInstance()
+	defer instance.Close()
+	user := db.GetUserByPhone(instance, phone)
 
 	c.JSON(200, gin.H{
-		"security_token": "example_security_token",
+		"security_token": "security_token_will_be_here",
+		"debug_userid":   &user.UID,
+		"debug_phone":    &user.Phone,
 	})
 }
